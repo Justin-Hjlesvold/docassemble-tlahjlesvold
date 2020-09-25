@@ -1,0 +1,56 @@
+objects:
+ - user: Individual
+ - client: Individual
+ - cohabs: DAList.using(object_type=Individual)
+---
+mandatory: true
+question: |
+  Hello, ${ user } and ${ client }!
+subquestion: |
+  I asked whether you liked cats. You said ${ user.likes_cats }.
+  
+  Your favourite elf is ${ user.favourite_elf }.
+  
+  Your signature ${ user.signature }.
+  
+  Have you been to the USA? ${ user.been_to_USA }.
+  
+  Have you been to Canada? ${ user.been_to_Canada }.
+  
+  You live with ${ cohabs }.
+---
+generic object: Individual
+question: |
+  What is ${ x.object_possessive('name') }?
+fields:
+  - First Name: x.name.first
+  - Last name: x.name.last
+---
+question: Do you like cats?
+yesno: user.likes_cats
+---
+question: |
+  Who is your favourite elf?
+field: user.favourite_elf
+choices:
+  - Drizz't
+  - Will Ferrell
+  - Santa
+---
+question: Please sign
+signature: user.signature
+---
+question: |
+  Where have you been?
+fields:
+  - note: Where have you been?
+  - Canada: user.been_to_Canada
+    datatype: yesnowide
+  - USA: user.been_to_USA
+    datatype: yesnowide
+---
+question: Do you live with anyone?
+yesno: cohabs.there_are_any
+---
+question: Do you live with anyone else?
+yesno: cohabs.there_is_another
