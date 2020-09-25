@@ -1,23 +1,23 @@
 objects:
  - user: Individual
  - client: Individual
- - cohabs: DAList.using(object_type=Individual)
+ - pets: DAList.using(object_type=Individual)
 ---
 mandatory: true
 question: |
   Hello, ${ user } and ${ client }!
 subquestion: |
-  I asked whether you liked cats. You said ${ user.likes_cats }.
+  I asked whether you liked Marvel movies. You said ${ user.likes_Marvel_movies }.
   
-  Your favourite elf is ${ user.favourite_elf }.
+  Your favourite Marvel character is ${ user.favourite_Marvel_character }.
   
   Your signature ${ user.signature }.
   
-  Have you been to the USA? ${ user.been_to_USA }.
+  Have tried shwarma? ${ user.tried_shwarma }.
   
-  Have you been to Canada? ${ user.been_to_Canada }.
+  Have you tried donair? ${ user.tried_donair }.
   
-  You live with ${ cohabs }.
+  You live with ${ pets }.
 ---
 generic object: Individual
 question: |
@@ -26,31 +26,31 @@ fields:
   - First Name: x.name.first
   - Last name: x.name.last
 ---
-question: Do you like cats?
-yesno: user.likes_cats
+question: Do you like Marvel movies?
+yesno: user.likes_Marvel_movies
 ---
 question: |
-  Who is your favourite elf?
-field: user.favourite_elf
+  Who is your favourite Marvel character?
+field: user.favourite_Marvel_character
 choices:
-  - Drizz't
-  - Will Ferrell
-  - Santa
+  - Spiderman
+  - Wolverine
+  - Thor
 ---
 question: Please sign
 signature: user.signature
 ---
 question: |
-  Where have you been?
+  What have you tried?
 fields:
-  - note: Where have you been?
-  - Canada: user.been_to_Canada
+  - note: What have you tried?
+  - shwarma: user.tried_shwarma
     datatype: yesnowide
-  - USA: user.been_to_USA
+  - donair: user.tried_donair
     datatype: yesnowide
 ---
-question: Do you live with anyone?
-yesno: cohabs.there_are_any
+question: Do have a pet?
+yesno: pets.there_are_any
 ---
-question: Do you live with anyone else?
-yesno: cohabs.there_is_another
+question: Do you have other pets?
+yesno: pets.there_is_another
