@@ -1,56 +1,64 @@
 objects:
- - user: Individual
- - client: Individual
- - pets: DAList.using(object_type=Individual)
+  - user: Individual
+  - family: DAList
 ---
 mandatory: true
 question: |
-  Hello, ${ user } and ${ client }!
-subquestion: |
-  I asked whether you liked Marvel movies. You said ${ user.likes_Marvel_movies }.
-  
-  Your favourite Marvel character is ${ user.favourite_Marvel_character }.
-  
-  Your signature ${ user.signature }.
-  
-  Have tried shwarma? ${ user.tried_shwarma }.
-  
-  Have you tried donair? ${ user.tried_donair }.
-  
-  You live with ${ pets }.
+ Results
+attachments:
+  - name: Document
+    filename: document
+    content: |
+      Legal Aid Memo
+      
+      Hi, ${ name },
+      
+      Today's date is ${ format_date(date) }, which can also be said like this: ${ format_date(date, format='M/d/yyyy') }
+      
+      % if len(family) > 0:
+      You live with ${ family }
+      % endif
+      
+      % if legal_aid:
+      You are in luck! Legal Aid can help you.
+      
+      % else:
+      We do not validate parking.
+      % endif
+      
 ---
-generic object: Individual
-question: |
-  What is ${ x.object_possessive('name') }?
+
+question: What is your name?
 fields:
-  - First Name: x.name.first
-  - Last name: x.name.last
+ - Name: name
+ 
 ---
-question: Do you like Marvel movies?
-yesno: user.likes_Marvel_movies
+
+question: Do you qualify for Legal Aid?
+yesno: legal_aid
+
 ---
-question: |
-  Who is your favourite Marvel character?
-field: user.favourite_Marvel_character
-choices:
-  - Spiderman
-  - Wolverine
-  - Thor
----
-question: Please sign
-signature: user.signature
----
-question: |
-  What have you tried?
+
+question: What is the date?
 fields:
-  - note: What have you tried?
-  - shwarma: user.tried_shwarma
-    datatype: yesnowide
-  - donair: user.tried_donair
-    datatype: yesnowide
+  - Date: date
+
 ---
-question: Do have a pet?
-yesno: pets.there_are_any
+
+question: Do you live with anyone?
+yesno: family.there_are_any
+
 ---
-question: Do you have other pets?
-yesno: pets.there_is_another
+
+question: Is there anyone else living with you?
+yesno: family.there_is_another
+
+---
+
+question: What are their names?
+fields:
+  - Family: family[i]
+
+---
+
+
