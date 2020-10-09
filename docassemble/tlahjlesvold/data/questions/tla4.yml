@@ -1,0 +1,143 @@
+objects:
+  - user: Individual
+---
+mandatory: true
+code: |
+
+ 
+  laa
+  afford_lawyer
+  unrepresented
+  no_lawyer
+  lawyer_acting
+  eligible
+  live_alberta
+  in_alberta
+  criminal_matter
+  family_matter
+  assistance
+
+---
+#Eligible
+code: |
+  if (unrepresented and live_alberta and (criminal_matter or family_matter)):
+    eligible = True
+  else:
+    eligible = False
+---
+#Assistance
+code: |
+  if ((eligible and in_alberta) or laa):
+    assistance = True
+  else:
+    assistance = False
+---
+#Unrepresented
+code: |
+  if lawyer_acting or afford_lawyer:
+    unrepresented = False
+  else:
+    unrepresented = True
+---
+mandatory: true
+question: |
+ Results
+subquestion: |
+
+  Dear ${ user },
+  
+  % if afford_lawyer:
+  You said you can afford a lawyer.
+  You do not qualify for Legal Aid.
+  % else:
+  % if (assistance and not afford_lawyer):
+  You qualify for Legal Aid.
+  % endif
+  % endif
+  
+
+  % if not afford_lawyer:
+  You told us you cannot afford a lawyer.
+  % if not no_lawyer and lawyer_acting:
+  You told us you have a former lawyer representing you.
+  % if not no_lawyer and not lawyer_acting:
+  You told us you are not represented.
+  % endif
+  % endif
+  % endif
+  
+  % if no_lawyer:
+  You said you don't have a lawyer.
+  % else:
+  % if not lawyer_acting:
+  You said you have a former lawyer acting for you.
+  % else:
+  % if lawyer_acting: 
+  You said you are not represented by former counsel.
+  % endif
+  % endif
+  % endif
+ 
+  % if laa:
+  You said you have received prior Legal Aid assistance with this appeal.
+  % else:
+  %if (criminal_matter or family_matter):
+  You said you have a criminal or family matter.
+  % if in_alberta:
+  You said your matter is in Alberta.
+  % if live_alberta:
+  You said you live in Alberta.
+  You qualify for Legal Aid.
+  % endif
+  % endif
+  % endif
+  % endif
+
+
+---
+
+question: |
+  What is your name?
+fields:
+ -Name: user.name.first
+---
+question: Is this matter an appeal of a matter you have previously received LAA assistance with?
+yesno: laa
+
+---
+
+question: Do you currently have a lawyer?
+noyes: no_lawyer
+
+---
+
+question: Can you afford a lawyer?
+yesno: afford_lawyer
+
+---
+
+question: If you have a lawyer, do they still represent you?
+noyes: lawyer_acting
+
+---
+
+question: Is your legal matter located within Alberta?
+yesno: in_alberta
+
+---
+
+question: Is your legal matter a family law matter?
+yesno: family_matter
+
+---
+
+question: Is your legal matter a criminal law matter?
+yesno: criminal_matter
+
+---
+
+question: Do you live within Alberta?
+yesno: live_alberta
+
+---
+
