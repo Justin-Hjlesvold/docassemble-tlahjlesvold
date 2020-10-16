@@ -1,0 +1,200 @@
+objects:
+  - user: Individual
+  - cohabs: DAList.using(object_type = Individual, complete_attribute="income")
+  - user.monthly_income: Value
+  - user.yearly_income: Value
+  - cohabs.monthly_income: Value
+  - cohabs.yearly_income: Value
+
+---
+mandatory: true
+code: |
+
+  user
+  
+  laa
+  afford_lawyer
+  eligible
+  assistance
+  
+
+---
+#Eligible
+code: |
+  if not laa and not afford_lawyer:
+    if (unrepresented and live_alberta and in_alberta and (criminal_matter or family_matter)):
+      eligible = True
+    else:
+      eligible = False
+  if laa:
+    eligible = True
+---
+#Assistance
+code: |
+  if (eligible or laa):
+    assistance = True
+  else:
+    assistance = False
+---
+#Unrepresented
+code: |
+  if not afford_lawyer:
+    if (no_lawyer and lawyer_acting):
+      unrepresented = True
+    else:
+      unrepresented = False
+    if (not no_lawyer and lawyer_acting):
+      unrepresented = True
+    if (not no_lawyer and not lawyer_acting):
+      unrepresented = False
+  if afford_lawyer:
+    eligible = False
+---
+mandatory: true
+question: |
+ Results
+subquestion: |
+
+  Dear ${ user },
+  
+  % if not afford_lawyer:
+  You told us you cannot afford a lawyer.
+  % if not no_lawyer:
+  You told us you have a lawyer.
+  % if not lawyer_acting:
+  You told us you have a lawyer still acting for you.
+  % else:
+  You told us your lawyer is no longer acting for you.
+  % endif
+  % else:
+  You told us you do not have a lawyer.
+  % endif
+  % else:
+  You told us that you can afford a lawyer.
+  % endif
+  
+  % if criminal_matter:
+  You said you have a criminal matter.
+  % endif
+  
+  % if family_matter:
+  You said you have a family matter.
+  % endif
+ 
+  % if not laa:
+  You said you have not received prior Legal Aid assistance with this appeal.
+  % if in_alberta:
+  You said your matter is in Alberta.
+  % if live_alberta:
+  You said you live in Alberta.
+  % else:
+  You said you do not live in Alberta.
+  % endif
+  % else: 
+  You said your matter is outside of Alberta.
+  % endif
+  % else:
+  You said you have received prior Legal Aid assistance with this matter.
+  % endif
+  
+  % if len(cohabs) > 0:
+  Your cohabitant ${ i } 
+  % for i in cohabs:
+    % if cohabs.assets > 0:
+    has assets of ${ i.assets },
+    % if i.monthly_income > 0:
+    an income last month of ${ i.monthly_income },
+    % if i.yearly_income > 0:
+    and an income of ${ i.yearly_income } in the last year.
+    % endif
+    % endif
+    % endif
+  % endfor
+  % endif
+  
+  % if assistance and unrepresented:
+  You qualify for Legal Aid.
+  % else:
+  You do not qualify for Legal Aid.
+  % endif
+---
+question: What is your name?
+fields:
+  - First Name: user.name.first
+  - Last Name: user.name.last
+---  
+question: |
+  Tell us about your income.
+fields:
+  - What was your income for the last month?: user.monthly_income
+    datatype: currency
+  - What was your income for the last year?: user.yearly_income
+    datatype: currency
+
+---
+question: Do you have any cohabitants?
+yesno: cohabs.there_are_any
+---
+generic object: Individual
+question: |
+  What is their name?
+fields:
+  - First Name: cohabs.name.first
+  - Last Name: cohabs.name.last
+---
+question: Are there any other cohabitants?
+yesno: cohabs.there_is_another
+---
+question: Does ${ i } have an income?
+yesno: cohabs[i].income
+---
+question: |
+  Tell us about ${ cohabs[i] }:
+fields:
+  - What are their assets?: cohabs[i].assets
+    datatype: currency
+  - What was their income last month?: cohabs[i].monthly_income.value
+    datatype: currency
+  - What was their income last year?: cohabs[i].yearly_income.value
+    datatype: currency
+---
+question: Is this matter an appeal of a matter you have previously received LAA assistance with?
+yesno: laa
+
+---
+
+question: Do you currently have a lawyer?
+noyes: no_lawyer
+
+---
+
+question: Can you afford a lawyer?
+yesno: afford_lawyer
+
+---
+
+question: If you have a lawyer, do they still represent you?
+noyes: lawyer_acting
+
+---
+
+question: Is your legal matter located within Alberta?
+yesno: in_alberta
+
+---
+
+question: Is your legal matter a family law matter?
+yesno: family_matter
+
+---
+
+question: Is your legal matter a criminal law matter?
+yesno: criminal_matter
+
+---
+
+question: Do you live within Alberta?
+yesno: live_alberta
+
+---
+
